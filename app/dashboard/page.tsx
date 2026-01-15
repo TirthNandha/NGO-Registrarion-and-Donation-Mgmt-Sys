@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import LogoutButton from '@/components/LogoutButton';
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -24,5 +26,10 @@ export default function Dashboard() {
     checkSession();
   }, [router]);
 
-  return <h1>User Dashboard</h1>;
+  return (
+    <div>
+      <h1>User Dashboard</h1>
+      <LogoutButton />
+    </div>
+  );
 }
