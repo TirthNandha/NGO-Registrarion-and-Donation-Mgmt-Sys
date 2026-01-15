@@ -17,12 +17,12 @@ export default function Dashboard() {
       }
       // Fetch role
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-      if (profile?.role !== 'admin') {
-        router.push('/auth');  // Redirect if not admin
+      if (profile?.role !== 'user') {
+        router.push('/auth');  // Redirect if not user
       }
     };
     checkSession();
   }, [router]);
 
-  return <h1>Admin Dashboard</h1>;
+  return <h1>User Dashboard</h1>;
 }
