@@ -43,8 +43,20 @@ export default function AuthForm() {
       });
       if (error) throw error;
 
-      // After login, Supabase sets cookie → next request will redirect via server
-      window.location.href = '/'; // force refresh to trigger server redirect
+      // Fetch user role and redirect accordingly
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

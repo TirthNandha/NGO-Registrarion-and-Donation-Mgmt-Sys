@@ -102,7 +102,7 @@ export default async function Home() {
           </Container>
         </section>
 
-        <section id="about" className="py-16">
+        <section id="about" className="scroll-mt-20 py-16">
           <Container className="space-y-10">
             <div className="max-w-2xl space-y-3">
               <h2 className="text-3xl font-semibold text-white">
@@ -133,7 +133,7 @@ export default async function Home() {
           </Container>
         </section>
 
-        <section id="how-it-works" className="py-16">
+        <section id="how-it-works" className="scroll-mt-20 py-16">
           <Container className="space-y-10">
             <div className="max-w-2xl space-y-3">
               <h2 className="text-3xl font-semibold text-white">
@@ -167,7 +167,7 @@ export default async function Home() {
           </Container>
         </section>
 
-        <section id="impact" className="py-16">
+        <section id="impact" className="scroll-mt-20 py-16">
           <Container className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
               <h2 className="text-3xl font-semibold text-white">
@@ -219,7 +219,7 @@ export default async function Home() {
           </Container>
         </section>
 
-        <section id="donations" className="py-16">
+        <section id="donations" className="scroll-mt-20 py-16">
           <Container className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-5">
               <h2 className="text-3xl font-semibold text-white">
