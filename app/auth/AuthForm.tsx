@@ -9,6 +9,7 @@ export default function AuthForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,12 +19,25 @@ export default function AuthForm() {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { name } },
       });
       if (error) throw error;
+
+      // Save phone number to profiles table
+      if (data.user && phoneNumber) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ phone_number: phoneNumber })
+          .eq('id', data.user.id);
+        
+        if (profileError) {
+          console.error('Error saving phone number:', profileError);
+        }
+      }
+
       alert('Signup successful! Check your email for confirmation.');
       setIsSignup(false);
     } catch (err: any) {
@@ -85,13 +99,22 @@ export default function AuthForm() {
 
       <div className="mt-6 space-y-4">
         {isSignup && (
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
-          />
+          <>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number (e.g., +911234567890)"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
+            />
+          </>
         )}
 
         <input

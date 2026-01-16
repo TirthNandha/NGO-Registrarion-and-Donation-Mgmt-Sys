@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import LogoutButton from '@/components/LogoutButton';
@@ -32,6 +32,12 @@ const donationRows = [
 export default function Dashboard() {
   const router = useRouter();
   const supabase = createClient();
+  const [userData, setUserData] = useState<{
+    name: string;
+    email: string;
+    phoneNumber: string;
+    createdAt: string;
+  } | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -42,15 +48,32 @@ export default function Dashboard() {
       }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, name, phone_number, created_at')
         .eq('id', session.user.id)
         .single();
       if (profile?.role !== 'user') {
         router.push('/auth');
+        return;
       }
+
+      // Set user data
+      const createdAtDate = profile.created_at ? new Date(profile.created_at) : null;
+      setUserData({
+        name: profile.name || 'N/A',
+        email: session.user.email || 'N/A',
+        phoneNumber: profile.phone_number || '',
+        createdAt: createdAtDate
+          ? createdAtDate.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              timeZone: 'UTC',
+            })
+          : 'N/A',
+      });
     };
     checkSession();
-  }, [router]);
+  }, [router, supabase]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -90,24 +113,25 @@ export default function Dashboard() {
               Your profile is saved even if a donation does not complete.
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {[
-                ['Full name', 'Supporter Name'],
-                ['Email', 'supporter@email.com'],
-                ['Role', 'User'],
-                ['Registered on', '01 Jan 2026'],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-2xl border border-white/10 bg-slate-900/40 p-4"
-                >
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    {label}
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-white">
-                    {value}
-                  </p>
-                </div>
-              ))}
+              {userData &&
+                [
+                  ['Full name', userData.name],
+                  ['Email', userData.email],
+                  ['Phone Number', userData.phoneNumber || 'Not provided'],
+                  ['Registered on', userData.createdAt],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-white/10 bg-slate-900/40 p-4"
+                  >
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      {label}
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-white">
+                      {value}
+                    </p>
+                  </div>
+                ))}
             </div>
           </div>
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
