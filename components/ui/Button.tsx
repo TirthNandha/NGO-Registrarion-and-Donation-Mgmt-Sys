@@ -1,19 +1,21 @@
 import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'primary' | 'outline' | 'ghost';
+type Variant = 'default' | 'outline' | 'ghost';
 type Size = 'sm' | 'md' | 'lg';
 
 const variantClass: Record<Variant, string> = {
-  primary: 'btn-primary',
-  outline: 'btn-outline',
-  ghost: 'btn-ghost',
+  default:
+    'bg-white text-slate-900 shadow-sm hover:bg-slate-100 focus-visible:ring-white',
+  outline:
+    'border border-white/20 text-white hover:border-white hover:text-white',
+  ghost: 'text-white/80 hover:bg-white/10',
 };
 
 const sizeClass: Record<Size, string> = {
-  sm: 'btn-sm',
-  md: 'btn-md',
-  lg: 'btn-lg',
+  sm: 'h-9 px-4 text-sm',
+  md: 'h-10 px-5 text-sm',
+  lg: 'h-12 px-6 text-base',
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -22,7 +24,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export function Button({
-  variant = 'primary',
+  variant = 'default',
   size = 'md',
   className,
   ...props
@@ -30,9 +32,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`btn ${variantClass[variant]} ${sizeClass[size]} ${
-        className ?? ''
-      }`}
+      className={`inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
     />
   );
 }
@@ -48,16 +48,14 @@ type ButtonLinkProps = {
 export function ButtonLink({
   href,
   children,
-  variant = 'primary',
+  variant = 'default',
   size = 'md',
   className,
 }: ButtonLinkProps) {
   return (
     <Link
       href={href}
-      className={`btn ${variantClass[variant]} ${sizeClass[size]} ${
-        className ?? ''
-      }`}
+      className={`inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
     >
       {children}
     </Link>

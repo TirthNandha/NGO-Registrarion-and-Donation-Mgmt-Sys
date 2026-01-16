@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/Button';
 
 export default function AuthForm() {
   const [isSignup, setIsSignup] = useState(false);
@@ -52,25 +53,32 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          {isSignup ? 'Sign Up' : 'Login'}
-        </h1>
+    <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_20px_45px_rgba(15,23,42,0.35)] backdrop-blur">
+      <div className="space-y-2 text-center">
+        <h2 className="text-2xl font-semibold text-white">
+          {isSignup ? 'Create your account' : 'Welcome back'}
+        </h2>
+        <p className="text-sm text-slate-300">
+          {isSignup
+            ? 'Register to support campaigns and manage your donations.'
+            : 'Sign in to view your registration and donation history.'}
+        </p>
+      </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="mt-6 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      )}
 
+      <div className="mt-6 space-y-4">
         {isSignup && (
           <input
             type="text"
             placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
           />
         )}
 
@@ -79,7 +87,7 @@ export default function AuthForm() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
         />
 
         <input
@@ -87,29 +95,28 @@ export default function AuthForm() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 mb-6 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="h-11 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-sm text-white placeholder:text-slate-500 focus:border-white/30 focus:outline-none"
         />
+      </div>
 
+      <Button
+        onClick={isSignup ? handleSignup : handleLogin}
+        disabled={loading}
+        size="lg"
+        className="mt-6 w-full bg-white text-slate-900 hover:bg-slate-100"
+      >
+        {loading ? 'Processing...' : isSignup ? 'Create Account' : 'Sign In'}
+      </Button>
+
+      <div className="mt-6 text-center text-sm text-slate-300">
+        {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
         <button
-          onClick={isSignup ? handleSignup : handleLogin}
-          disabled={loading}
-          className={`w-full py-2 px-4 rounded text-white font-medium transition-colors ${
-            loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+          type="button"
+          onClick={() => setIsSignup(!isSignup)}
+          className="font-semibold text-white"
         >
-          {loading ? 'Processing...' : isSignup ? 'Create Account' : 'Sign In'}
+          {isSignup ? 'Sign In' : 'Sign Up'}
         </button>
-
-        <div className="mt-6 text-center text-sm">
-          {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            type="button"
-            onClick={() => setIsSignup(!isSignup)}
-            className="text-blue-600 hover:underline font-medium"
-          >
-            {isSignup ? 'Sign In' : 'Sign Up'}
-          </button>
-        </div>
       </div>
     </div>
   );
