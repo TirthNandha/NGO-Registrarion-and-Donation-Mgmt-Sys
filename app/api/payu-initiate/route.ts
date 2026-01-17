@@ -18,10 +18,23 @@ export async function POST(req: NextRequest) {
     const email = 'test@example.com'; // Replace with real
     const phone = '9999999999';
 
-    // Generate hash (PayU SHA-512 format for v1)
-    const hashString = `${merchantKey}|${txnid}|${amountStr}|${productinfo}|${firstname}|${email}|||||||||||${salt}`;
-    const hash = crypto.createHash('sha512').update(hashString).digest('hex').toLowerCase();
+    // UDF fields (udf1 = donationId for tracking)
+    const udf1 = donationId;
+    const udf2 = '';
+    const udf3 = '';
+    const udf4 = '';
+    const udf5 = '';
 
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    
+    // Generate hash (PayU SHA-512 format)
+    // Format: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||SALT
+    const hashString = `${merchantKey}|${txnid}|${amountStr}|${productinfo}|${firstname}|${email}|${udf1}|${udf2}|${udf3}|${udf4}|${udf5}||||||${salt}`;
+    const hash = crypto
+      .createHash('sha512')
+      .update(hashString)
+      .digest('hex')
+      .toLowerCase();
     const payuParams = {
       key: merchantKey,
       hash,
@@ -30,11 +43,14 @@ export async function POST(req: NextRequest) {
       productinfo,
       firstname,
       email,
-      phone,
-      surl: `${req.headers.get('origin')}/dashboard?payment=success&donationId=${donationId}&txnid=${txnid}`,
-      furl: `${req.headers.get('origin')}/dashboard?payment=failed&donationId=${donationId}&txnid=${txnid}`,
-      // Optional: notifyurl for webhook
-      // notifyurl: 'https://your-ngrok-url/api/payu-webhook',
+      phone: phone || '9999999999',
+      surl: `${origin}/api/payment-callback?donationId=${donationId}&txnid=${txnid}`,
+      furl: `${origin}/api/payment-callback?donationId=${donationId}&txnid=${txnid}`,
+      udf1,
+      udf2,
+      udf3,
+      udf4,
+      udf5,
     };
 
     return NextResponse.json({

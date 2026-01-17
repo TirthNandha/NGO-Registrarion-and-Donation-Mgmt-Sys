@@ -3,6 +3,16 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const pathname = request.nextUrl.pathname;
+  const method = request.method;
+
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+  // Skip auth for PayU POST callbacks to /dashboard and /api/payu-callback
+  if ((pathname === '/dashboard' || pathname === '/api/payu-callback') && method === 'POST') {
+    return NextResponse.next(); // Allow through without check
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,8 +32,6 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
 
   const protectedRoutes = ['/dashboard', '/admin'];
 
