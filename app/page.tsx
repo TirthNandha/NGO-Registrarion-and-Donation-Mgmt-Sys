@@ -4,10 +4,10 @@ import FeatureCard from '@/components/home/FeatureCard';
 import Container from '@/components/ui/Container';
 import { ButtonLink } from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function Home() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   let role: 'admin' | 'user' | 'superadmin' | null = null;

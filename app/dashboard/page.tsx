@@ -1,11 +1,10 @@
-'use client';
-
 /**
  * User Dashboard Page
  * Displays user profile, donation summary, and donation history
  */
 
-import { useMemo } from 'react';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';
 import AppHeader from '@/components/layout/AppHeader';
 import Footer from '@/components/layout/Footer';
@@ -14,28 +13,59 @@ import { ButtonLink } from '@/components/ui/Button';
 import UserProfileCard from '@/components/dashboard/UserProfileCard';
 import DonationSummaryCard from '@/components/dashboard/DonationSummaryCard';
 import DonationHistoryTable from '@/components/dashboard/DonationHistoryTable';
-import { useUserDashboard } from '@/lib/hooks/useUserDashboard';
+import type { UserProfile } from '@/lib/types';
 
-export default function Dashboard() {
-  const { userData, donations, loading } = useUserDashboard();
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
+export default async function Dashboard() {
+  const supabase = await createClient();
+
+  // Check authentication
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    redirect('/auth');
+  }
+
+  // Check user role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, name, phone_number, created_at')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'user') {
+    redirect('/auth');
+  }
+
+  // Fetch user data
+  const createdAtDate = profile.created_at ? new Date(profile.created_at) : null;
+  const userData: UserProfile = {
+    name: profile.name || 'N/A',
+    email: user.email || 'N/A',
+    phoneNumber: profile.phone_number || 'Not provided',
+    createdAt: createdAtDate
+      ? createdAtDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      : 'N/A',
+  };
+
+  // Fetch donations
+  const { data: donations } = await supabase
+    .from('donations')
+    .select('id, amount, status, timestamp, transaction_id')
+    .eq('user_id', user.id)
+    .order('timestamp', { ascending: false });
+
+  const donationsList = donations || [];
 
   // Calculate donation statistics
-  const donationStats = useMemo(() => {
-    const totalAttempts = donations.length;
-    const successful = donations.filter(d => d.status === 'success').length;
-    const pending = donations.filter(d => d.status === 'pending').length;
-    const failed = donations.filter(d => d.status === 'failed').length;
+  const totalAttempts = donationsList.length;
+  const successful = donationsList.filter(d => d.status === 'success').length;
+  const pending = donationsList.filter(d => d.status === 'pending').length;
+  const failed = donationsList.filter(d => d.status === 'failed').length;
 
-    return { totalAttempts, successful, pending, failed };
-  }, [donations]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <p className="text-xl">Loading...</p>
-      </div>
-    );
-  }
+  const donationStats = { totalAttempts, successful, pending, failed };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -71,12 +101,12 @@ export default function Dashboard() {
 
         {/* Profile and Summary Cards */}
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          {userData && <UserProfileCard userData={userData} />}
+          <UserProfileCard userData={userData} />
           <DonationSummaryCard {...donationStats} />
         </section>
 
         {/* Donation History */}
-        <DonationHistoryTable donations={donations} />
+        <DonationHistoryTable donations={donationsList} />
       </Container>
 
       <Footer />
