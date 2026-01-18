@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import AuthForm from '@/app/auth/AuthForm';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Container from '@/components/ui/Container';
 import Footer from '@/components/layout/Footer';
 
 export default async function AuthPage() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 
