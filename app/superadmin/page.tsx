@@ -1,27 +1,68 @@
-'use client';
+/**
+ * Super Admin Dashboard Page
+ * Manage user roles and view system-wide statistics
+ */
 
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';
 import AppHeader from '@/components/layout/AppHeader';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/ui/Container';
 import { ButtonLink } from '@/components/ui/Button';
 import StatsOverview from '@/components/admin/StatsOverview';
-import UserManagement from '@/components/superadmin/UserManagement';
-import { useSuperAdminData } from '@/lib/hooks/useSuperAdminData';
+import UserManagementClient from '@/components/superadmin/UserManagementClient';
+import type { DonationStats } from '@/lib/types';
 
 // Force dynamic rendering for authenticated pages
 export const dynamic = 'force-dynamic';
 
-export default function SuperAdminDashboard() {
-  const { allUsers, loading, stats, refetch } = useSuperAdminData();
+export default async function SuperAdminDashboard() {
+  const supabase = await createClient();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <p className="text-xl">Loading super admin dashboard...</p>
-      </div>
-    );
+  // Check authentication and superadmin role
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    redirect('/auth');
   }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'superadmin') {
+    redirect('/dashboard');
+  }
+
+  // Fetch all users
+  const { data: usersData } = await supabase
+    .from('profiles')
+    .select('id, name, email, phone_number, role, created_at')
+    .order('created_at', { ascending: false });
+
+  // Fetch donation statistics
+  const { data: donationsData } = await supabase
+    .from('donations')
+    .select('amount, status');
+
+  const allUsers = usersData || [];
+  const donations = donationsData || [];
+  
+  const successful = donations.filter((d) => d.status === 'success');
+  const pending = donations.filter((d) => d.status === 'pending');
+  const failed = donations.filter((d) => d.status === 'failed');
+  const totalDonated = successful.reduce((sum, d) => sum + Number(d.amount), 0);
+
+  const stats: DonationStats = {
+    totalRegistrations: allUsers.length,
+    totalDonations: totalDonated,
+    successfulDonations: successful.length,
+    pendingDonations: pending.length,
+    failedDonations: failed.length,
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -56,7 +97,7 @@ export default function SuperAdminDashboard() {
         <StatsOverview stats={stats} />
 
         {/* User Management */}
-        <UserManagement users={allUsers} onRoleChange={refetch} />
+        <UserManagementClient users={allUsers} />
       </Container>
 
       <Footer />

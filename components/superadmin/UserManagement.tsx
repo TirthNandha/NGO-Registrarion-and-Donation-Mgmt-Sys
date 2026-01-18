@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * User management component for super admin
  * Allows viewing all users and changing their roles
