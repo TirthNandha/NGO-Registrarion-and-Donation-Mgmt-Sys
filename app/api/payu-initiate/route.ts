@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
 
     const merchantKey = process.env.PAYU_MERCHANT_KEY!;
     const salt = process.env.PAYU_MERCHANT_SALT!;
+    // Generate txnid (required by PayU, used for hash calculation)
+    // Note: We don't store this in DB - we use PayU's mihpayid from callback instead
     const txnid = `TXN_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const productinfo = `Donation_${donationId}`;
     const amountStr = amount.toFixed(2);

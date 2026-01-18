@@ -60,7 +60,7 @@ export default function Dashboard() {
 
       const { data } = await supabase
         .from('donations')
-        .select('*')
+        .select('id, amount, status, timestamp, transaction_id')
         .eq('user_id', session.user.id)
         .order('timestamp', { ascending: false });
 

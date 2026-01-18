@@ -25,8 +25,7 @@ export async function GET(req: NextRequest) {
       .from('donations')
       .update({ 
         status: 'failed', 
-        transaction_id: mihpayid || txnid || null, // Prefer PayU's ID if available
-        txnid: txnid || null 
+        transaction_id: mihpayid || null // Only store PayU's transaction ID
       })
       .eq('id', donationId);
     
@@ -47,14 +46,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.formData();
 
-    const txnid = body.get('txnid') as string;
+    const txnid = body.get('txnid') as string; // Our generated ID (for PayU communication only)
     const status = body.get('status') as string;
     const amount = body.get('amount') as string;
     const productinfo = body.get('productinfo') as string;
     const firstname = body.get('firstname') as string;
     const email = body.get('email') as string;
-    const mihpayid = body.get('mihpayid') as string; // PayU's actual transaction ID
-    const bank_ref_num = body.get('bank_ref_num') as string; // Bank reference number
+    const mihpayid = body.get('mihpayid') as string; // PayU's actual transaction ID (stored in DB)
+    const bank_ref_num = body.get('bank_ref_num') as string; // Bank reference number (fallback)
     const udf1 = body.get('udf1') || '';
     const udf2 = body.get('udf2') || '';
     const udf3 = body.get('udf3') || '';
@@ -64,9 +63,9 @@ export async function POST(req: NextRequest) {
 
     console.log('=== PayU Callback ===');
     console.log('Status:', status);
-    console.log('Our TxnID:', txnid);
-    console.log('PayU MihpayID:', mihpayid);
-    console.log('Bank Ref:', bank_ref_num);
+    console.log('Our TxnID (for PayU only):', txnid);
+    console.log('PayU MihpayID (will be stored):', mihpayid);
+    console.log('Bank Ref (fallback):', bank_ref_num);
 
     const key = process.env.PAYU_MERCHANT_KEY!;
     const salt = process.env.PAYU_MERCHANT_SALT!;
@@ -104,14 +103,13 @@ export async function POST(req: NextRequest) {
 
     console.log('Payment status from PayU:', status, '→ Updating to:', newStatus);
     console.log('DonationID:', donationId);
-    console.log('Storing PayU Transaction ID:', mihpayid);
+    console.log('Storing PayU Transaction ID:', mihpayid || bank_ref_num || 'N/A');
 
     const { error: updateError } = await supabase
       .from('donations')
       .update({ 
         status: newStatus, 
-        transaction_id: mihpayid || bank_ref_num || txnid || null, // Use PayU's ID, fallback to bank ref or our txnid
-        txnid: txnid || null // Keep our original txnid for reference
+        transaction_id: mihpayid || bank_ref_num || null // Only store PayU's transaction ID
       })
       .eq('id', donationId);
 
