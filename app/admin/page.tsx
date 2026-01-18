@@ -1,8 +1,3 @@
-/**
- * Admin Dashboard Page
- * Main entry point for admin functionality, composed of reusable components
- */
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';

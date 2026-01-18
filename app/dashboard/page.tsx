@@ -1,8 +1,3 @@
-/**
- * User Dashboard Page
- * Displays user profile, donation summary, and donation history
- */
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';

@@ -1,8 +1,3 @@
-/**
- * Donation Page
- * Allows authenticated users to make donations
- */
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Container from '@/components/ui/Container';
