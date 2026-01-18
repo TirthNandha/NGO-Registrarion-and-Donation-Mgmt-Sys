@@ -65,7 +65,9 @@ export default function AuthForm() {
           .eq('id', data.user.id)
           .single();
 
-        if (profile?.role === 'admin') {
+        if (profile?.role === 'superadmin') {
+          window.location.href = '/superadmin';
+        } else if (profile?.role === 'admin') {
           window.location.href = '/admin';
         } else {
           window.location.href = '/dashboard';

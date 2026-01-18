@@ -17,7 +17,13 @@ export default async function AuthPage() {
       .eq('id', user.id)
       .single();
 
-    redirect(profile?.role === 'admin' ? '/admin' : '/dashboard');
+    redirect(
+      profile?.role === 'superadmin' 
+        ? '/superadmin' 
+        : profile?.role === 'admin' 
+        ? '/admin' 
+        : '/dashboard'
+    );
   }
 
   // If not logged in → show the form

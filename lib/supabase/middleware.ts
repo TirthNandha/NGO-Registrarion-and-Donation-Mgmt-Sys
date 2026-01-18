@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const protectedRoutes = ['/dashboard', '/admin'];
+  const protectedRoutes = ['/dashboard', '/admin', '/superadmin'];
 
   if (protectedRoutes.some(route => pathname.startsWith(route)) && !user) {
     return NextResponse.redirect(new URL('/auth', request.url));
@@ -53,12 +53,25 @@ export async function updateSession(request: NextRequest) {
 
     const role = profile?.role;
 
-    if (pathname.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+    // Super admin access control
+    if (pathname.startsWith('/superadmin') && role !== 'superadmin') {
+      return NextResponse.redirect(new URL(role === 'admin' ? '/admin' : '/dashboard', request.url));
     }
 
+    // Admin access control
+    if (pathname.startsWith('/admin') && !pathname.startsWith('/superadmin')) {
+      if (role !== 'admin' && role !== 'superadmin') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+    }
+
+    // Redirect admins and superadmins away from user dashboard
     if (pathname.startsWith('/dashboard') && role === 'admin') {
       return NextResponse.redirect(new URL('/admin', request.url));
+    }
+
+    if (pathname.startsWith('/dashboard') && role === 'superadmin') {
+      return NextResponse.redirect(new URL('/superadmin', request.url));
     }
   }
 
