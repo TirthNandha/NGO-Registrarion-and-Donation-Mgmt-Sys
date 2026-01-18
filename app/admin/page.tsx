@@ -44,13 +44,41 @@ export default async function AdminDashboard() {
     .select('id, name, email, phone_number, role, created_at')
     .order('created_at', { ascending: false });
 
-  // Fetch all donations
-  const { data: donations } = await supabase
+  // Fetch all donations with user profile data
+  const { data: donations, error: donationsError } = await supabase
     .from('donations')
-    .select('id, user_id, amount, status, timestamp, transaction_id, donor_name, donor_email');
+    .select(`
+      id,
+      user_id,
+      amount,
+      status,
+      timestamp,
+      transaction_id,
+      profiles!user_id (
+        name,
+        email
+      )
+    `)
+    .order('timestamp', { ascending: false });
+
+  // Log any errors for debugging
+  if (donationsError) {
+    console.error('Error fetching donations:', donationsError);
+  }
 
   const registrationsList = registrations || [];
-  const donationsList = donations || [];
+  
+  // Transform donations to include donor info
+  const donationsList = (donations || []).map((donation: any) => ({
+    id: donation.id,
+    user_id: donation.user_id,
+    amount: donation.amount,
+    status: donation.status,
+    timestamp: donation.timestamp,
+    transaction_id: donation.transaction_id,
+    donor_name: donation.profiles?.name || 'N/A',
+    donor_email: donation.profiles?.email || 'N/A',
+  }));
 
   // Calculate stats
   const successful = donationsList.filter((d) => d.status === 'success');
