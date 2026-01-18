@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'default' | 'outline' | 'ghost';
+type Variant = 'default' | 'primary' | 'outline' | 'ghost';
 type Size = 'sm' | 'md' | 'lg';
 
 const variantClass: Record<Variant, string> = {
   default:
     'bg-white text-slate-900 shadow-sm hover:bg-slate-100 focus-visible:ring-white',
+  primary:
+    'bg-blue-600 text-white shadow-sm hover:bg-blue-700 focus-visible:ring-blue-500',
   outline:
     'border border-white/20 text-white hover:border-white hover:text-white',
   ghost: 'text-white/80 hover:bg-white/10',

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import AuthForm from '@/app/auth/AuthForm';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import Container from '@/components/ui/Container';
+import Footer from '@/components/layout/Footer';
 
 export default async function AuthPage() {
   const supabase = await createServerSupabaseClient();
@@ -35,6 +36,7 @@ export default async function AuthPage() {
       <main className="flex min-h-[calc(100vh-96px)] items-center justify-center px-6 py-12">
         <AuthForm />
       </main>
+      <Footer />
     </div>
   );
 }

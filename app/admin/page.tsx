@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import LogoutButton from '@/components/LogoutButton';
 import AppHeader from '@/components/layout/AppHeader';
+import Footer from '@/components/layout/Footer';
 import Container from '@/components/ui/Container';
 import { ButtonLink } from '@/components/ui/Button';
 
@@ -243,6 +244,8 @@ export default function Dashboard() {
           </div>
         </section>
       </Container>
+
+      <Footer />
     </div>
   );
 }

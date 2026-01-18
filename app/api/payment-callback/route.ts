@@ -1,18 +1,51 @@
-// app/api/payment-callback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY! // Service role key here
+  process.env.SUPABASE_SERVICE_KEY! 
 );
+
+// Handle GET requests (for cancellations or failed payments)
+export async function GET(req: NextRequest) {
+  console.log('GET request to payment callback - likely cancellation or failed payment');
+  
+  const searchParams = req.nextUrl.searchParams;
+  const donationId = searchParams.get('donationId');
+  const txnid = searchParams.get('txnid');
+
+  console.log('DonationID:', donationId, 'TxnID:', txnid);
+
+  // If we have donationId from URL, mark it as failed
+  if (donationId) {
+    console.log('Marking donation as failed (GET request):', donationId);
+    const { error } = await supabase
+      .from('donations')
+      .update({ 
+        status: 'failed', 
+        transaction_id: txnid || null,
+        txnid: txnid || null 
+      })
+      .eq('id', donationId);
+    
+    if (error) {
+      console.error('Error updating donation:', error);
+    } else {
+      console.log('✅ Donation marked as failed');
+    }
+  }
+
+  // Redirect to dashboard with failed status
+  const redirectUrl = new URL('/dashboard', req.url);
+  redirectUrl.searchParams.set('payment', 'failed');
+  return NextResponse.redirect(redirectUrl, 302);
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.formData(); // PayU sends form-urlencoded data
+    const body = await req.formData();
 
-    // Extract key fields from PayU POST body
     const txnid = body.get('txnid') as string;
     const status = body.get('status') as string;
     const amount = body.get('amount') as string;
@@ -26,11 +59,9 @@ export async function POST(req: NextRequest) {
     const udf5 = body.get('udf5') || '';
     const receivedHash = (body.get('hash') as string)?.toLowerCase();
 
-    // Get your keys (test mode)
     const key = process.env.PAYU_MERCHANT_KEY!;
     const salt = process.env.PAYU_MERCHANT_SALT!;
 
-    // Build response hash string (IMPORTANT: order is salt first!)
     const hashString = `${salt}|${status}||||||${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
 
     const calculatedHash = crypto
@@ -48,30 +79,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid hash' }, { status: 400 });
     }
 
-    // Hash valid → process donation update
-    // donationId must be passed as custom field in request (e.g., udf1 = donationId)
-    const donationId = body.get('udf1') as string; // Use udf1 for donationId (change if you used different)
+   const donationId = body.get('udf1') as string;
 
     if (!donationId) {
       console.error('No donationId in callback');
       return NextResponse.json({ error: 'Missing donationId' }, { status: 400 });
     }
 
-    const newStatus = status === 'success' ? 'success' : 'failed';
+    let newStatus = 'failed';
+    if (status === 'success') {
+      newStatus = 'success';
+    } else if (status === 'pending') {
+      newStatus = 'pending';
+    }
+
+    console.log('Payment status from PayU:', status, '→ Updating to:', newStatus);
+    console.log('DonationID:', donationId, 'TxnID:', txnid);
 
     const { error: updateError } = await supabase
       .from('donations')
-      .update({ status: newStatus, transaction_id: txnid })
+      .update({ 
+        status: newStatus, 
+        transaction_id: txnid || null,
+        txnid: txnid || null
+      })
       .eq('id', donationId);
 
     if (updateError) {
       console.error('Supabase update error:', updateError);
+    } else {
+      console.log('✅ Donation updated successfully to', newStatus);
     }
 
     // Redirect to dashboard with status for alert
     const redirectUrl = new URL('/dashboard', req.url);
     redirectUrl.searchParams.set('payment', newStatus);
-    redirectUrl.searchParams.set('donationId', donationId);
 
     return NextResponse.redirect(redirectUrl, 302);
   } catch (err) {

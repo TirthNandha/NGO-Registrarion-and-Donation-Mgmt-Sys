@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Container from '@/components/ui/Container';
 import AppHeader from '@/components/layout/AppHeader';
-import { Button } from '@/components/ui/Button'; // assuming you have this
+import Footer from '@/components/layout/Footer';
+import { Button } from '@/components/ui/Button';
 
 export default function DonatePage() {
   const router = useRouter();
@@ -43,6 +44,8 @@ export default function DonatePage() {
 
       if (insertError || !donation) throw insertError || new Error('Failed to track donation');
 
+      console.log("passing this Name: ", user.user_metadata?.name);
+      console.log("passing this Email: ", user.email);
       // Step 2: Initiate PayU payment
       const initiateRes = await fetch('/api/payu-initiate', {
         method: 'POST',
@@ -50,9 +53,9 @@ export default function DonatePage() {
         body: JSON.stringify({
           amount,
           donationId: donation.id,
-          // Optional: pass real user data for prefill
           firstname: user.user_metadata?.name || 'User',
           email: user.email || 'user@example.com',
+          phone: user.user_metadata?.phone_number || '9999999999',
         }),
       });
 
@@ -116,7 +119,9 @@ export default function DonatePage() {
             <Button
               type="submit"
               disabled={loading || amount <= 0}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold"
+              variant="primary"
+              size="lg"
+              className="w-full"
             >
               {loading ? 'Processing...' : 'Proceed to Pay Securely'}
             </Button>
@@ -127,6 +132,8 @@ export default function DonatePage() {
           </p>
         </div>
       </Container>
+
+      <Footer />
     </div>
   );
 }
