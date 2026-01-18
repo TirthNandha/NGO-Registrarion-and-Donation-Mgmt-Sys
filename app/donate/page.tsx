@@ -8,6 +8,9 @@ import AppHeader from '@/components/layout/AppHeader';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 export default function DonatePage() {
   const router = useRouter();
   const [amount, setAmount] = useState<number>(0);

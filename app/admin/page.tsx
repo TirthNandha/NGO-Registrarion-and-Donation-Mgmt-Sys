@@ -17,6 +17,9 @@ import { useAdminData } from '@/lib/hooks/useAdminData';
 import { useRegistrationFilters } from '@/lib/hooks/useRegistrationFilters';
 import { useDonationFilters } from '@/lib/hooks/useDonationFilters';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 export default function AdminDashboard() {
   // Fetch admin data
   const { registrations, donations, loading, stats } = useAdminData();

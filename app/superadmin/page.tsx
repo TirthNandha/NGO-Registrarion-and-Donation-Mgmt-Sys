@@ -1,10 +1,5 @@
 'use client';
 
-/**
- * Super Admin Dashboard Page
- * Allows super admin to view stats and manage user roles
- */
-
 import LogoutButton from '@/components/LogoutButton';
 import AppHeader from '@/components/layout/AppHeader';
 import Footer from '@/components/layout/Footer';
@@ -13,6 +8,9 @@ import { ButtonLink } from '@/components/ui/Button';
 import StatsOverview from '@/components/admin/StatsOverview';
 import UserManagement from '@/components/superadmin/UserManagement';
 import { useSuperAdminData } from '@/lib/hooks/useSuperAdminData';
+
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
 
 export default function SuperAdminDashboard() {
   const { allUsers, loading, stats, refetch } = useSuperAdminData();
