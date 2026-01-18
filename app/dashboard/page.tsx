@@ -13,6 +13,7 @@ import { ButtonLink } from '@/components/ui/Button';
 import UserProfileCard from '@/components/dashboard/UserProfileCard';
 import DonationSummaryCard from '@/components/dashboard/DonationSummaryCard';
 import DonationHistoryTable from '@/components/dashboard/DonationHistoryTable';
+import PaymentNotification from '@/components/dashboard/PaymentNotification';
 import type { UserProfile } from '@/lib/types';
 
 // Force dynamic rendering for authenticated pages
@@ -69,6 +70,9 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
+      {/* Payment notification handler */}
+      <PaymentNotification />
+      
       <AppHeader
         actions={
           <>
