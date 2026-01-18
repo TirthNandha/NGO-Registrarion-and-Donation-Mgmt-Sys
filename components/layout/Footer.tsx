@@ -19,6 +19,19 @@ export default function Footer() {
           </span>
         </div>
       </Container>
+      <div className="border-t border-white/10 py-6">
+        <Container className="text-center text-sm text-slate-400">
+          Made with <span className="text-rose-500">❤</span> by{' '}
+          <a
+            href="https://www.linkedin.com/in/tirthnandha/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white font-semibold hover:text-blue-400 transition-colors"
+          >
+            Tirth
+          </a>
+        </Container>
+      </div>
     </footer>
   );
 }

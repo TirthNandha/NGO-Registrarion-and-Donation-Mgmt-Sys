@@ -1,43 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import LogoutButton from '@/components/LogoutButton';
 import AppHeader from '@/components/layout/AppHeader';
+import Footer from '@/components/layout/Footer';
 import Container from '@/components/ui/Container';
 import { ButtonLink } from '@/components/ui/Button';
 
-const donationRows = [
-  {
-    id: 'DON-1207',
-    amount: '₹1,200',
-    status: 'Success',
-    date: '12 Jan 2026',
-  },
-  {
-    id: 'DON-1198',
-    amount: '₹500',
-    status: 'Pending',
-    date: '10 Jan 2026',
-  },
-  {
-    id: 'DON-1183',
-    amount: '₹750',
-    status: 'Failed',
-    date: '05 Jan 2026',
-  },
-];
-
 export default function Dashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
   const [userData, setUserData] = useState<{
     name: string;
     email: string;
     phoneNumber: string;
     createdAt: string;
   } | null>(null);
+
+  const [donations, setDonations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -61,19 +46,46 @@ export default function Dashboard() {
       setUserData({
         name: profile.name || 'N/A',
         email: session.user.email || 'N/A',
-        phoneNumber: profile.phone_number || '',
+        phoneNumber: profile.phone_number || 'Not provided',
         createdAt: createdAtDate
-          ? createdAtDate.toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-              timeZone: 'UTC',
-            })
+          ? createdAtDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
           : 'N/A',
       });
     };
     checkSession();
-  }, [router, supabase]);
+
+    const fetchDonations = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data } = await supabase
+        .from('donations')
+        .select('id, amount, status, timestamp, transaction_id')
+        .eq('user_id', session.user.id)
+        .order('timestamp', { ascending: false });
+
+      setDonations(data || []);
+      setLoading(false);
+    };
+    fetchDonations();
+
+    // Success/Failed message from query param
+    const payment = searchParams.get('payment');
+    if (payment) {
+      alert(`Payment ${payment.toUpperCase()}! Your donation status has been updated.`);
+      router.replace('/dashboard'); // Clean URL
+    }
+  }, [router, supabase, searchParams]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading...</div>;
+  }
+
+  // Dynamic summary (real)
+  const totalAttempts = donations.length;
+  const successful = donations.filter(d => d.status === 'success').length;
+  const pending = donations.filter(d => d.status === 'pending').length;
+  const failed = donations.filter(d => d.status === 'failed').length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -117,7 +129,7 @@ export default function Dashboard() {
                 [
                   ['Full name', userData.name],
                   ['Email', userData.email],
-                  ['Phone Number', userData.phoneNumber || 'Not provided'],
+                  ['Phone Number', userData.phoneNumber],
                   ['Registered on', userData.createdAt],
                 ].map(([label, value]) => (
                   <div
@@ -141,10 +153,10 @@ export default function Dashboard() {
             </p>
             <div className="mt-6 space-y-4">
               {[
-                ['Total attempts', '12'],
-                ['Successful donations', '8'],
-                ['Pending', '2'],
-                ['Failed', '2'],
+                ['Total attempts', totalAttempts],
+                ['Successful donations', successful],
+                ['Pending', pending],
+                ['Failed', failed],
               ].map(([label, value]) => (
                 <div
                   key={label}
@@ -166,45 +178,51 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="mt-6 grid gap-3">
-            {donationRows.map((row) => (
-              <div
-                key={row.id}
-                className="grid gap-3 rounded-2xl border border-white/10 bg-slate-900/40 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]"
-              >
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Donation ID
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-white">{row.id}</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Amount
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-white">{row.amount}</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Date
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-white">{row.date}</p>
-                </div>
-                <span
-                  className={`h-fit rounded-full px-3 py-1 text-xs font-semibold ${
-                    row.status === 'Success'
-                      ? 'bg-emerald-500/10 text-emerald-200'
-                      : row.status === 'Pending'
-                      ? 'bg-amber-400/10 text-amber-200'
-                      : 'bg-rose-500/10 text-rose-200'
-                  }`}
+            {donations.length === 0 ? (
+              <p className="text-center text-slate-400 py-12">No donations yet. Make your first one!</p>
+            ) : (
+              donations.map((row) => (
+                <div
+                  key={row.id}
+                  className="grid gap-3 rounded-2xl border border-white/10 bg-slate-900/40 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]"
                 >
-                  {row.status}
-                </span>
-              </div>
-            ))}
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      Donation ID
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">{row.id.slice(0, 8).toUpperCase()}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      Amount
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">₹{row.amount}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      Date
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">{new Date(row.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                  <span
+                    className={`h-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                      row.status === 'success'
+                        ? 'bg-emerald-500/10 text-emerald-200'
+                        : row.status === 'pending'
+                        ? 'bg-amber-400/10 text-amber-200'
+                        : 'bg-rose-500/10 text-rose-200'
+                    }`}
+                  >
+                    {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </Container>
+
+      <Footer />
     </div>
   );
 }
