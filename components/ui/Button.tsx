@@ -34,7 +34,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
+      className={`inline-flex items-center justify-center rounded-full font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
     />
   );
 }
@@ -57,7 +57,7 @@ export function ButtonLink({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
+      className={`inline-flex items-center justify-center rounded-full font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${variantClass[variant]} ${sizeClass[size]} ${className ?? ''}`}
     >
       {children}
     </Link>

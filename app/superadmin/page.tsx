@@ -1,8 +1,3 @@
-/**
- * Super Admin Dashboard Page
- * Manage user roles and view system-wide statistics
- */
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';

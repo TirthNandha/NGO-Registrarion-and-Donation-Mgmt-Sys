@@ -150,7 +150,7 @@ export default function AuthForm() {
         <button
           type="button"
           onClick={() => setIsSignup(!isSignup)}
-          className="font-semibold text-white"
+          className="font-semibold text-white cursor-pointer hover:underline"
         >
           {isSignup ? 'Sign In' : 'Sign Up'}
         </button>

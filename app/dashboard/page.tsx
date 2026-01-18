@@ -1,8 +1,3 @@
-/**
- * User Dashboard Page
- * Displays user profile, donation summary, and donation history
- */
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/LogoutButton';
@@ -13,6 +8,7 @@ import { ButtonLink } from '@/components/ui/Button';
 import UserProfileCard from '@/components/dashboard/UserProfileCard';
 import DonationSummaryCard from '@/components/dashboard/DonationSummaryCard';
 import DonationHistoryTable from '@/components/dashboard/DonationHistoryTable';
+import PaymentNotification from '@/components/dashboard/PaymentNotification';
 import type { UserProfile } from '@/lib/types';
 
 // Force dynamic rendering for authenticated pages
@@ -69,6 +65,9 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
+      {/* Payment notification handler */}
+      <PaymentNotification />
+      
       <AppHeader
         actions={
           <>
