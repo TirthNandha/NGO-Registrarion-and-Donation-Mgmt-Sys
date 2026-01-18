@@ -10,7 +10,7 @@ export default async function Home() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let role: 'admin' | 'user' | null = null;
+  let role: 'admin' | 'user' | 'superadmin' | null = null;
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -22,8 +22,8 @@ export default async function Home() {
 
   const cta = user
     ? {
-        href: role === 'admin' ? '/admin' : '/dashboard',
-        label: role === 'admin' ? 'Go to Admin' : 'Go to Dashboard',
+        href: role === 'superadmin' ? '/superadmin' : role === 'admin' ? '/admin' : '/dashboard',
+        label: role === 'superadmin' ? 'Go to Super Admin' : role === 'admin' ? 'Go to Admin' : 'Go to Dashboard',
       }
     : { href: '/auth', label: 'Login' };
 

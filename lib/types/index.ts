@@ -2,12 +2,14 @@
  * Shared type definitions used across the application
  */
 
+export type UserRole = 'user' | 'admin' | 'superadmin';
+
 export type Registration = {
   id: string;
   name: string;
   email: string;
   phone_number: string;
-  role: string;
+  role: UserRole;
   created_at: string;
 };
 
