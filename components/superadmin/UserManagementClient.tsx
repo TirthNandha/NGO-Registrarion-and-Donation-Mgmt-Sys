@@ -1,10 +1,5 @@
 'use client';
 
-/**
- * Client-side User Management Component for Super Admin
- * Handles filtering and role management
- */
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import RoleChangeModal from './RoleChangeModal';

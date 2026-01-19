@@ -1,9 +1,5 @@
 'use client';
 
-/**
- * Client-side Donation Management Component
- * Handles filtering and CSV export of donation records
- */
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
