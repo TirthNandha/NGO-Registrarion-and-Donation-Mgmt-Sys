@@ -1,7 +1,3 @@
-/**
- * Confirmation modal for role changes
- */
-
 import { Button } from '@/components/ui/Button';
 import type { UserRole } from '@/lib/types';
 
