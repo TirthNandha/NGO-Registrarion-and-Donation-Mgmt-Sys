@@ -6,20 +6,20 @@ A secure, full-stack web application that separates user registration from donat
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Database Schema](#database-schema)
-- [Installation & Setup](#installation--setup)
-- [Environment Variables](#environment-variables)
-- [Project Structure](#project-structure)
-- [Application Flow](#application-flow)
-- [API Endpoints](#api-endpoints)
-- [Authentication & Authorization](#authentication--authorization)
-- [Payment Integration](#payment-integration)
-- [Development](#development)
-- [Screenshots](#screenshots)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Database Schema](#-database-schema)
+- [Installation & Setup](#-installation--setup)
+- [Environment Variables](#-environment-variables)
+- [Project Structure](#-project-structure)
+- [Application Flow](#-application-flow)
+- [API Endpoints](#-api-endpoints)
+- [Authentication & Authorization](#-authentication--authorization)
+- [Payment Integration](#-payment-integration)
+- [Development](#-development)
+- [Screenshots](#-screenshots)
 
 ---
 
@@ -84,7 +84,7 @@ A secure, full-stack web application that separates user registration from donat
 
 ---
 
-## 🏗️ Architecture
+## 📦 Architecture
 
 ### Client vs Server Components
 
