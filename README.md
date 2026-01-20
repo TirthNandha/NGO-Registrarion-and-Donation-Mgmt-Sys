@@ -18,6 +18,7 @@ A secure, full-stack web application that separates user registration from donat
 - [API Endpoints](#-api-endpoints)
 - [Authentication & Authorization](#-authentication--authorization)
 - [Payment Integration](#-payment-integration)
+- [Test Credentials](#-test-credentials)
 - [Development](#-development)
 - [Screenshots](#-screenshots)
 
@@ -759,6 +760,29 @@ This application uses **PayU Payment Gateway** in **Test/Sandbox mode**.
 - ⚠️ **Test Mode Only**: This uses PayU sandbox environment
 - ⚠️ **No Real Money**: No actual transactions occur
 - ⚠️ **Production**: Replace `PAYU_ENV=test` with `production` and use live credentials
+
+---
+
+## 🧪 Test Credentials
+
+You can use the following test accounts to explore different features of the application:
+
+### 👤 User Account
+- **Email**: `ntirth15@gmail.com`
+- **Password**: `123456`
+- **Access**: User dashboard, donation functionality
+
+### 🛡️ Admin Account
+- **Email**: `nandhatirth@gmail.com`
+- **Password**: `123456`
+- **Access**: Admin dashboard, user management, donation management, export features
+
+### 🔐 Super Admin Account
+- **Email**: `mpro3579@gmail.com`
+- **Password**: `123456`
+- **Access**: Full system access, user role management, all admin features
+
+> **Note**: These credentials are for testing purposes only. In a production environment, use strong, unique passwords and enable additional security measures.
 
 ---
 
