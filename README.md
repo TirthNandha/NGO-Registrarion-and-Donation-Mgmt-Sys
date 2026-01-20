@@ -2,8 +2,6 @@
 
 A secure, full-stack web application that separates user registration from donation flow, ensuring data integrity, transparency, and ethical handling of payments for NGO campaigns.
 
-> 📚 **New to this project?** Check out the [Documentation Index](DOCUMENTATION_INDEX.md) for a guided tour through all documentation files.
-
 ---
 
 ## 📋 Table of Contents
@@ -525,146 +523,7 @@ ngo-system/
 
 ## 🔄 Application Flow
 
-### 1. User Registration & Login Flow
-
-```
-┌─────────────┐
-│   Landing   │
-│    Page     │ ──[Click Login]──►  ┌──────────┐
-└─────────────┘                     │   /auth  │
-                                    └────┬─────┘
-                                         │
-                    ┌────────────────────┴────────────────────┐
-                    │                                         │
-                    ▼                                         ▼
-            ┌───────────────┐                        ┌───────────────┐
-            │  Login Form   │                        │  Signup Form  │
-            └───────┬───────┘                        └───────┬───────┘
-                    │                                        │
-                    │                                        │
-                    │  Auth Successful                       │ Create Account
-                    │  (Supabase Auth)                       │ (+ Profile in DB)
-                    │                                        │
-                    └────────────────┬───────────────────────┘
-                                     │
-                          Check role from profiles table
-                                     │
-         ┌───────────────────────────┼───────────────────────────┐
-         │                           │                           │
-         ▼                           ▼                           ▼
-    role='user'               role='admin'              role='superadmin'
-         │                           │                           │
-         ▼                           ▼                           ▼
-  ┌──────────┐              ┌────────────┐              ┌──────────────┐
-  │/dashboard│              │   /admin   │              │ /superadmin  │
-  └──────────┘              └────────────┘              └──────────────┘
-```
-
-### 2. Donation Flow
-
-```
-┌──────────────┐
-│ User clicks  │
-│ "Donate Now" │
-└──────┬───────┘
-       │
-       ▼
-┌─────────────────┐
-│  /donate page   │ ◄── User enters amount
-└────────┬────────┘
-         │
-         │ Submit Form
-         │
-         ▼
-┌────────────────────┐
-│ Create donation    │ ◄── INSERT into donations table
-│ record (pending)   │     (status = 'pending')
-└────────┬───────────┘
-         │
-         ▼
-┌────────────────────┐
-│ Call /api/payu-    │ ◄── Generate hash, prepare PayU params
-│ initiate           │
-└────────┬───────────┘
-         │
-         │ Return PayU URL + params
-         │
-         ▼
-┌────────────────────┐
-│ Redirect to PayU   │ ◄── User enters card details, OTP
-│ payment page       │
-└────────┬───────────┘
-         │
-         │ User completes/cancels payment
-         │
-         ▼
-┌────────────────────────┐
-│ PayU sends callback    │
-│ to /api/payment-       │
-│ callback               │
-└────────┬───────────────┘
-         │
-         │ Verify hash
-         │
-         ▼
-    ┌────────┐
-    │ Status?│
-    └───┬────┘
-        │
-        ├─── success ────► UPDATE donations SET status='success',
-        │                  transaction_id='mihpayid'
-        │
-        ├─── failed ─────► UPDATE donations SET status='failed',
-        │                  transaction_id='mihpayid'
-        │
-        └─── pending ────► UPDATE donations SET status='pending'
-                           (no transaction_id)
-         │
-         ▼
-┌────────────────────┐
-│ Redirect to        │ ◄── Show success/failure message
-│ /dashboard?        │
-│ payment=success    │
-└────────────────────┘
-```
-
-### 3. Admin Dashboard Flow
-
-```
-┌─────────────┐
-│ Admin Login │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────┐
-│  /admin page loads  │ ◄── Server Component
-│  (Server-side)      │
-└──────┬──────────────┘
-       │
-       │ Fetch data from Supabase
-       │
-       ├──► SELECT * FROM profiles (all users)
-       │
-       ├──► SELECT * FROM donations JOIN profiles (all donations)
-       │
-       │ Calculate stats
-       │
-       ▼
-┌──────────────────────────┐
-│ Render Dashboard         │
-│ - Total Registrations    │
-│ - Total Donations (₹)    │
-│ - Success/Pending/Failed │
-└──────────┬───────────────┘
-           │
-           ▼
-┌───────────────────────────┐
-│ Client-side filtering     │ ◄── RegistrationManagementClient
-│ - Search by name/email    │     DonationManagementClient
-│ - Filter by role/status   │
-│ - Export to CSV           │
-└───────────────────────────┘
-```
+For application flow, please refer to the diagrams in the [diagrams](./public/images/diagrams) folder.
 
 ---
 
@@ -946,18 +805,18 @@ DROP TABLE IF EXISTS profiles CASCADE;
 ## 📸 Screenshots
 
 ### Landing Page
-![Landing Page](./public/images/landing-page-1.png)
+![Landing Page](./public/images/screenshots/landing-page-1.png)
 
-![Landing Page 2](./public/images/landing-page-2.png)
+![Landing Page 2](./public/images/screenshots/landing-page-2.png)
 
 ### User Dashboard
-![User Dashboard](./public/images/user-dashboard.png)
+![User Dashboard](./public/images/screenshots/user-dashboard.png)
 
 ### Admin Dashboard
-![Admin Dashboard](./public/images/admin-dashboard.png)
+![Admin Dashboard](./public/images/screenshots/admin-dashboard.png)
 
 ### Super Admin Dashboard
-![Super Admin Dashboard](./public/images/superadmin-dashboard.png)
+![Super Admin Dashboard](./public/images/screenshots/superadmin-dashboard.png)
 
 <div align="center">
 Made with ❤️ by <a href="https://www.linkedin.com/in/tirthnandha/" target="_blank">Tirth Nandha</a>
