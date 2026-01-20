@@ -1,7 +1,3 @@
-/**
- * API endpoint for updating user roles (superadmin only)
- */
-
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 

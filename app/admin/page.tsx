@@ -56,7 +56,6 @@ export default async function AdminDashboard() {
     `)
     .order('timestamp', { ascending: false });
 
-  // Log any errors for debugging
   if (donationsError) {
     console.error('Error fetching donations:', donationsError);
   }
@@ -103,7 +102,6 @@ export default async function AdminDashboard() {
       />
 
       <Container className="space-y-10 py-10">
-        {/* Header */}
         <section className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-semibold text-white">Admin Dashboard</h2>
@@ -113,13 +111,10 @@ export default async function AdminDashboard() {
           </div>
         </section>
 
-        {/* Stats Overview */}
         <StatsOverview stats={stats} />
 
-        {/* Registration Management */}
         <RegistrationManagementClient registrations={registrationsList} />
 
-        {/* Donation Management */}
         <DonationManagementClient donations={donationsList} />
       </Container>
 

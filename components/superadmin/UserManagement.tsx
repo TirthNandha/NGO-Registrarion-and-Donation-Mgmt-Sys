@@ -1,10 +1,5 @@
 'use client';
 
-/**
- * User management component for super admin
- * Allows viewing all users and changing their roles
- */
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import RoleChangeModal from './RoleChangeModal';
