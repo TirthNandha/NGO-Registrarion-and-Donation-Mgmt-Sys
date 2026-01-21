@@ -24,7 +24,7 @@ export default function AuthForm() {
         password,
         options: { 
           data: { name },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/`
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/?verified=true`
         },
       });
       if (error) throw error;

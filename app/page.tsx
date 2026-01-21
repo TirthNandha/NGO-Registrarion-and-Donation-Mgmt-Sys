@@ -4,6 +4,7 @@ import FeatureCard from '@/components/home/FeatureCard';
 import Container from '@/components/ui/Container';
 import { ButtonLink } from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import EmailVerificationNotification from '@/components/home/EmailVerificationNotification';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function Home() {
@@ -29,6 +30,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <EmailVerificationNotification />
       <Navbar cta={cta} />
 
       <main>
